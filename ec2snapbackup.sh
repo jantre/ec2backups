@@ -15,11 +15,11 @@ RETENTION_DAYS=3
 REGION=us-east-1
 
 which ec2-describe-volumes > /dev/null
-X=`echo $?`
+X=$?
 if [ "$X" != "0" ]
 then
 	echo "ERROR: ec2-describe-volumes command was not found on this system"
-	exit 2;
+	exit $X
 fi
 
 TODAY=`date +%s`
@@ -31,11 +31,11 @@ rm -f $TMP_SFILE
 
 #1. Get the instance ID of the EC2 instance the script is running on.
 INSTANCE_ID=`curl -s http://169.254.169.254/1.0/meta-data/instance-id`
-X=`echo $?`
+X=$?
 if [ "$X" != "0" ] && [ "$INSTANCE_ID" != "" ];
 then
 	echo "ERROR: Something went wrong when trying to find the ID of the instance this script is running on."
-	exit $X;
+	exit $X
 fi
 echo "Instance ID detected as $INSTANCE_ID"
 #2. Find the volumes attached to the EC2 Instance the script is running on.
@@ -68,7 +68,7 @@ echo "Snapshot is $snapshot"
 	then
 		echo "Snapshot $snapshot is past its retention time and will now be deleted."
 		ec2-delete-snapshot -O $AWS_ACCESS_KEY -W $AWS_SECRET_KEY --region $REGION $snapshot
-		X=`echo $?`
+		X=$?
 		if [ "$X" != "0" ]
 		then
 			echo "Warning: Something went wrong when trying to delete snapshot id $snapshot"
